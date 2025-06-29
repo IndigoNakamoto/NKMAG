@@ -12,30 +12,28 @@ docker run -d -p 27017:27017 --name my-mongo-db mongo
 
 ## 2. Set Node.js Version
 
-To ensure compatibility, switch to the correct Node.js version using `nvm`:
+To ensure compatibility, switch to the correct Node.js version using `nvm`. Thanks to the `.nvmrc` file, you can just run:
 
 ```bash
-nvm use 20
+nvm use
 ```
 
-## 3. Start the Development Servers
+## 3. Install Dependencies
 
-The monorepo contains two separate applications: the Payload CMS and the Next.js web frontend. You will need to run both concurrently in separate terminal windows.
-
-### Start the CMS Server
-
-In your first terminal, run the following command to start the Payload CMS, which will be available at `http://localhost:3007`:
+If you haven't already, install the project dependencies:
 
 ```bash
-pnpm --filter cms dev
+pnpm install
 ```
 
-### Start the Web Frontend Server
+## 4. Start the Development Servers
 
-In a second terminal, run the following command to start the Next.js web application, which will be available at `http://localhost:3008`:
+This command will start both the CMS and the web frontend concurrently from the root of the project.
 
 ```bash
-pnpm --filter web dev
+pnpm dev
 ```
 
-Once both servers are running, you can access the CMS admin panel at `http://localhost:3007/admin` and the web frontend at `http://localhost:3008`.
+Once running, you can access:
+- **Web Frontend**: `http://localhost:3008`
+- **CMS Admin Panel**: `http://localhost:3007/admin`

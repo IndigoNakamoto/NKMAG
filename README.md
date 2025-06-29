@@ -15,7 +15,7 @@ This project is a pnpm-managed monorepo.
 
 1.  **Set Node.js Version**:
     ```bash
-    nvm use 20
+    nvm use
     ```
 2.  **Start Database**:
     ```bash
@@ -29,4 +29,5 @@ This project is a pnpm-managed monorepo.
     ```bash
     pnpm dev
     ```
-    This will start both the CMS (on `http://localhost:3000`) and the web frontend (on `http://localhost:3001`).
+
+    This will start both the CMS (on `http://localhost:3007`) and the web frontend (on `http://localhost:3008`).
