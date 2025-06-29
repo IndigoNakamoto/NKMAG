@@ -8,6 +8,11 @@ export const ImageBlock: Block = {
   },
   fields: [
     {
+      name: 'zIndex',
+      type: 'number',
+      label: 'z-index',
+    },
+    {
       name: 'image',
       type: 'upload',
       relationTo: 'media',
@@ -16,6 +21,11 @@ export const ImageBlock: Block = {
     {
       name: 'caption',
       type: 'text',
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Is this a featured image?',
     },
   ],
 }

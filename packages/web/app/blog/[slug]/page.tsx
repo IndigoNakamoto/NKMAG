@@ -1,20 +1,13 @@
 import React from 'react'
 import Link from 'next/link'
-import { BlockRenderer } from '../../../components/BlockRenderer'
-
-// Define a generic Block type to satisfy the linter
-interface Block {
-  id: string
-  blockType: string
-  [key: string]: unknown
-}
+import { BlockRenderer, type LexicalRoot } from '@/components/BlockRenderer'
 
 // Define a simple type for our Post documents, including the content blocks
 interface Post {
   id: string
   title: string
   slug: string
-  content: Block[] // Using 'Block[]' instead of 'any[]'
+  content: LexicalRoot
   createdAt: string
 }
 
@@ -31,7 +24,7 @@ interface PageProps {
 }
 
 async function PostPage({ params }: PageProps) {
-  const { slug } = params
+  const { slug } = await params
   let post: Post | null = null
 
   try {
@@ -81,7 +74,7 @@ async function PostPage({ params }: PageProps) {
       </p>
 
       <div className="mt-8">
-        <BlockRenderer blocks={post.content} />
+        <BlockRenderer content={post.content} />
       </div>
     </main>
   )

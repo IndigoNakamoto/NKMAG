@@ -8,6 +8,11 @@ export const CodeBlock: Block = {
   },
   fields: [
     {
+      name: 'zIndex',
+      type: 'number',
+      label: 'z-index',
+    },
+    {
       name: 'language',
       type: 'select',
       options: [

@@ -1,91 +1,141 @@
-import React from 'react'
+import React, { Fragment } from 'react'
+import { CodeBlock } from '@/components/custom-blocks/CodeBlock'
+import { ImageBlock } from '@/components/custom-blocks/ImageBlock'
 
-// Define a generic Block type
-interface Block {
-  id: string
-  blockType: string
+// --- Type Definitions for Lexical Editor ---
+
+// This represents a single node in the Lexical JSON structure
+type LexicalNode = {
+  type: string
+  children?: LexicalNode[]
+  direction?: 'ltr' | 'rtl' | null
+  format?: string | number
+  indent?: number
+  version: number
+  style?: string
+  tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'ul' | 'ol' | 'li'
+  text?: string
+  fields?: {
+    blockType: string
+    [key: string]: unknown
+  }
   [key: string]: unknown
 }
 
-// --- Placeholder Components ---
-// In the future, these will be moved to their own files and fully implemented.
+// This is the root structure of the 'content' field from Payload
+export type LexicalRoot = {
+  root: {
+    children: LexicalNode[]
+    direction: 'ltr' | 'rtl' | null
+    format: string | number
+    indent: number
+    type: 'root'
+    version: number
+  }
+}
 
-const RichTextBlock = ({ block }: { block: Block }) => (
-  <div className="prose lg:prose-xl max-w-none">
-    <h4>Rich Text Block</h4>
-    <pre className="bg-gray-100 p-2 rounded text-sm">
-      {JSON.stringify(block, null, 2)}
-    </pre>
-  </div>
-)
+// --- Block Components ---
+// A mapping from block slugs (from the CMS) to their corresponding React components.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const blockComponents: { [key: string]: React.FC<any> } = {
+  code: CodeBlock,
+  image: ImageBlock,
+}
 
-const ImageBlock = ({ block }: { block: Block }) => (
-  <div>
-    <h4>Image Block</h4>
-    <pre className="bg-gray-100 p-2 rounded text-sm">
-      {JSON.stringify(block, null, 2)}
-    </pre>
-  </div>
-)
+// --- The Serializer ---
+// This function recursively walks the Lexical node tree and renders components.
 
-const CodeBlock = ({ block }: { block: Block }) => (
-  <div>
-    <h4>Code Block</h4>
-    <pre className="bg-gray-100 p-2 rounded text-sm">
-      {JSON.stringify(block, null, 2)}
-    </pre>
-  </div>
-)
+const serialize = (nodes: LexicalNode[]): React.ReactNode => {
+  return nodes.map((node, i) => {
+    if (node.type === 'text') {
+      let text = <span dangerouslySetInnerHTML={{ __html: node.text || '' }} />
+      if (node.bold) {
+        text = <strong key={i}>{text}</strong>
+      }
+      if (node.italic) {
+        text = <em key={i}>{text}</em>
+      }
+      if (node.underline) {
+        text = <u key={i}>{text}</u>
+      }
+      // Handle other text formatting like strikethrough, code, etc. if needed
+      return <Fragment key={i}>{text}</Fragment>
+    }
 
-const BlockchainDataBlock = ({ block }: { block: Block }) => (
-  <div>
-    <h4>Blockchain Data Block</h4>
-    <pre className="bg-gray-100 p-2 rounded text-sm">
-      {JSON.stringify(block, null, 2)}
-    </pre>
-  </div>
-)
+    if (!node) {
+      return null
+    }
 
-// A mapping from block type slugs to their corresponding components
-const blockComponents: { [key: string]: React.FC<{ block: Block }> } = {
-  RichTextBlock: RichTextBlock,
-  ImageBlock: ImageBlock,
-  CodeBlock: CodeBlock,
-  BlockchainDataBlock: BlockchainDataBlock,
+    switch (node.type) {
+      case 'heading':
+        const Tag = node.tag || 'p'
+        const tagClasses: { [key: string]: string } = {
+          h1: 'text-4xl lg:text-5xl font-bold my-6 lg:my-8',
+          h2: 'text-3xl lg:text-4xl font-bold my-5 lg:my-7',
+          h3: 'text-2xl lg:text-3xl font-bold my-4 lg:my-6',
+          h4: 'text-xl lg:text-2xl font-bold my-3 lg:my-5',
+          h5: 'text-lg lg:text-xl font-bold my-2 lg:my-4',
+          h6: 'text-base lg:text-lg font-bold my-1 lg:my-3',
+        }
+        return (
+          <Tag key={i} className={tagClasses[node.tag || ''] || 'mb-4'}>
+            {serialize(node.children || [])}
+          </Tag>
+        )
+      case 'paragraph':
+        return <p key={i} className="my-4">{serialize(node.children || [])}</p>
+      case 'list':
+        const ListTag = node.tag || 'ul'
+        const listClasses = 'list-disc list-outside my-4 ml-6'
+        return <ListTag key={i} className={listClasses}>{serialize(node.children || [])}</ListTag>
+      case 'listitem':
+        return <li key={i} className="mb-2">{serialize(node.children || [])}</li>
+      case 'link':
+        const url = (node.fields?.url as string) || ''
+        return (
+          <a href={url} key={i} className="text-blue-600 hover:underline">
+            {serialize(node.children || [])}
+          </a>
+        )
+      case 'linebreak':
+        return <br key={i} />
+      case 'block':
+        if (node.fields) {
+          const Component = blockComponents[node.fields.blockType]
+          if (Component) {
+            return <Component key={i} {...node.fields} />
+          }
+        }
+        return (
+          <div key={i} className="border-2 border-dashed border-yellow-400 p-4">
+            <p className="font-semibold text-yellow-600">
+              {`Unknown CMS Block: "${node.fields?.blockType || 'unknown'}"`}
+            </p>
+          </div>
+        )
+      default:
+        return <p key={i}>{serialize(node.children || [])}</p>
+    }
+  })
 }
 
 // --- The Master Block Renderer ---
 
 interface BlockRendererProps {
-  blocks: Block[]
+  content: LexicalRoot
+  className?: string
 }
 
-export const BlockRenderer = ({ blocks }: BlockRendererProps) => {
-  if (!blocks || blocks.length === 0) {
+export const BlockRenderer = ({ content, className }: BlockRendererProps) => {
+  if (!content?.root?.children) {
     return <p>This post has no content.</p>
   }
 
+  const serializedContent = serialize(content.root.children)
+
   return (
-    <div className="space-y-8">
-      {blocks.map(block => {
-        const Component = blockComponents[block.blockType]
-
-        if (Component) {
-          return <Component key={block.id} block={block} />
-        }
-
-        // Fallback for unknown block types
-        return (
-          <div key={block.id} className="border-2 border-dashed border-red-400 p-4">
-            <p className="font-semibold text-red-600">
-              {`Unknown Block Type: "${block.blockType}"`}
-            </p>
-            <pre className="text-xs mt-2 bg-red-50 p-2">
-              {JSON.stringify(block, null, 2)}
-            </pre>
-          </div>
-        )
-      })}
+    <div className={`prose lg:prose-xl max-w-none ${className}`}>
+      {serializedContent}
     </div>
   )
 }

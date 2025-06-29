@@ -2,10 +2,8 @@ import type { CollectionConfig, Field } from 'payload'
 import type { Post } from '@/payload-types'
 
 import { lexicalEditor, BlocksFeature, FixedToolbarFeature } from '@payloadcms/richtext-lexical'
-// import { RichTextBlock } from '../components/Blocks/RichTextBlock'
 import { ImageBlock } from '../components/Blocks/ImageBlock'
 import { CodeBlock } from '../components/Blocks/CodeBlock'
-import { BlockchainDataBlock } from '../components/Blocks/BlockchainDataBlock'
 import { formatSlug } from '../utils/formatSlug'
 
 const postFields: Field[] = [
@@ -40,7 +38,7 @@ const postFields: Field[] = [
         ...defaultFeatures,
         FixedToolbarFeature(),
         BlocksFeature({
-          blocks: [ImageBlock, CodeBlock, BlockchainDataBlock], // Add your custom blocks here [richTextBlock],
+          blocks: [ImageBlock, CodeBlock], // Add your custom blocks here
         }),
       ],
     }),
@@ -161,6 +159,9 @@ export const Posts: CollectionConfig = {
       const webUrl = process.env.PAYLOAD_PUBLIC_WEB_URL || 'http://localhost:3001'
       return doc.slug ? `${webUrl}/blog/${doc.slug}` : null
     },
+  },
+  access: {
+    read: () => true,
   },
   timestamps: true,
   fields: [...postFields, ...sidebarFields],
