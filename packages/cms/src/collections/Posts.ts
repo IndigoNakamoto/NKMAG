@@ -156,7 +156,7 @@ export const Posts: CollectionConfig = {
     defaultColumns: ['title', 'author', 'status', 'updatedAt'],
     preview: (doc: any) => {
       // The web app is on a different port, so we need a full URL
-      const webUrl = process.env.PAYLOAD_PUBLIC_WEB_URL || 'http://localhost:3001'
+      const webUrl = process.env.PAYLOAD_PUBLIC_WEB_URL || 'http://localhost:3008'
       return doc.slug ? `${webUrl}/blog/${doc.slug}` : null
     },
   },
