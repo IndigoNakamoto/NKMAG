@@ -164,15 +164,15 @@ export interface Media {
  */
 export interface Post {
   id: string;
+  /**
+   * Select or create tags for this post.
+   */
+  featuredImage?: (string | null) | Media;
   title: string;
   /**
    * A short summary of the post to display on list pages or in social media previews.
    */
   excerpt?: string | null;
-  /**
-   * Select or create tags for this post.
-   */
-  featuredImage?: (string | null) | Media;
   content?: {
     root: {
       type: string;
@@ -323,9 +323,9 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
+  featuredImage?: T;
   title?: T;
   excerpt?: T;
-  featuredImage?: T;
   content?: T;
   slug?: T;
   author?: T;
