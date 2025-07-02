@@ -1,13 +1,18 @@
-import { Orbitron } from 'next/font/google'
+import { Orbitron, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { Header } from '@/components/Header'
 // import SpaceDust from '@/components/SpaceDust'
 // import TexturedGradient from '@/components/TexturedGradient'
-import CryptoTicker from '@/components/CryptoTicker'
+import InfoBar from '@/components/InfoBar'
 
 const orbitron = Orbitron({
   subsets: ['latin'],
   variable: '--font-orbitron',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
 })
 
 export const metadata = {
@@ -18,10 +23,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${orbitron.variable} font-sans antialiased`}>
+      <body className={`${orbitron.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <Header />
         <div className="pt-16">
-          <CryptoTicker />
+          <InfoBar />
         </div>
         <main className="pt-8">{children}</main>
       </body>

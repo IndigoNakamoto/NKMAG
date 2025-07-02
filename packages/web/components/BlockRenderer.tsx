@@ -101,9 +101,10 @@ const serialize = (nodes: LexicalNode[]): React.ReactNode => {
         return <br key={i} />
       case 'block':
         if (node.fields) {
-          const Component = blockComponents[node.fields.blockType]
+          const { blockType, ...rest } = node.fields
+          const Component = blockComponents[blockType]
           if (Component) {
-            return <Component key={i} {...node.fields} />
+            return <Component key={i} {...rest} />
           }
         }
         return (

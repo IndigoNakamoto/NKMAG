@@ -17,8 +17,13 @@ interface Block {
 
 export const ImageBlock = (block: Block) => {
   const { image, caption, featured } = block
-  const imageUrl = typeof image === 'string' ? image : image?.url
+  let imageUrl = typeof image === 'string' ? image : image?.url
   const altText = typeof image === 'string' ? 'Image' : image?.alt || 'Image'
+
+  // Prepend the Payload URL if it's a relative path
+  if (imageUrl && imageUrl.startsWith('/')) {
+    imageUrl = `${process.env.NEXT_PUBLIC_PAYLOAD_URL}${imageUrl}`
+  }
 
   if (!imageUrl) {
     return (

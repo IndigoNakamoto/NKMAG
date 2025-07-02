@@ -8,6 +8,15 @@ import { formatSlug } from '../utils/formatSlug'
 
 const postFields: Field[] = [
   {
+    name: 'featuredImage',
+    type: 'upload',
+    relationTo: 'media',
+    label: 'Featured Image',
+    admin: {
+      description: 'Select or create tags for this post.',
+    },
+  },
+  {
     name: 'title',
     type: 'text',
     required: true,
@@ -18,16 +27,6 @@ const postFields: Field[] = [
     label: 'Excerpt',
     admin: {
       description: 'A short summary of the post to display on list pages or in social media previews.',
-    },
-  },
-  {
-    name: 'featuredImage',
-    type: 'upload',
-    relationTo: 'media',
-    label: 'Featured Image',
-    admin: {
-      position: 'sidebar',
-      description: 'Select or create tags for this post.',
     },
   },
   {
